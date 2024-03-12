@@ -3,3 +3,4 @@ node_modules
 .eslint*
 *.code-workspace
 .vscode
+.sqlite
