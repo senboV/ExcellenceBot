@@ -55,8 +55,7 @@ for (const file of eventFiles){
     const event = require(filePath);
     if (event.once) {
         client.once(event.name, (...args) => event.execute(...args));
-    }
-    else {
+    } else {
         client.on(event.name, (...args) => event.execute(...args));
     }
 }
@@ -86,8 +85,20 @@ for (const file of eventFiles){
  */
 
 /** 
+ * TODO: Various improvements -> 
+ * date range
+ * max length messages
+ * time buffer between first post/editing and additional reactions (grace period)
+ * embed color as setting?
+ * admin command: force an embed on a specific post
+ * admin command: delete an existing embed
+ * admin command: mark message as exempt
+ * handle other reaction events: purge (all and single), and remove
+ */
+
+/** 
  * Log in the bot with the token from the environment variables and handle potential login errors
  */ 
 client.login(process.env.DISCORD_TOKEN).catch((err) => {
-    console.log(`Error logging in: ${err}`);
+    console.error(`Error logging in: ${err}`);
 });

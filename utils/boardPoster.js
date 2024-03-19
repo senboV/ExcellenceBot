@@ -2,75 +2,118 @@ const { EmbedBuilder, messageLink } = require('discord.js');
 const botConfiguration = require('./botConfiguration.js');
 
 /** 
- * Full Embeds should include:
+ * Embed Format should follow:
+ * - Original Message Reply-Parent + a new line
  * - Original Message Content
- * - empty line
- * - link to original message
- * - link to attachment of any media
- * - preview of any media
- * - footer of emote count - Timestamp
- * And descriptions should handle the first 4 lines
+ * - 2x new lines 
+ * - hyperlink to original message
+ * - newline + hyperlink to attachment of any media
+ * - preview of any media (gif, image, or video thumbnail)
+ * - footer with emote count and Timestamp
  */
 
-// Returns a formatted string that will be used to standardize the description content in an Embed
-function formatDescription(messageReaction, attachment) {
-	var description = `${messageReaction.message.content}`;
-	description += `\n\nOriginal message: ${messageLink(messageReaction.message.channelId, messageReaction.message.id)}`;
-	// check for media content
-	if (attachment) {
-		description += `\nFile: [${attachment.name}](${attachment.url})`;
+const createNewEmbed = async (messageReaction) => {
+	const originalMessage = messageReaction.message;
+	var embedContent = {
+		description: '',
+		imageUrls: [],
 	}
-	return description;
-}
 
-// Returns null or the only Attachment to be used in an Embed
-// TODO: This if statement looks like shit, probably a better way to write it
-// TODO: handle stickers, gifs, and videos
-function getAttachment(messageReaction) {
-	// check for media content
-	if (!messageReaction.message.attachments) {
-		console.log("messageReaction has no attachments");
-	} else if (messageReaction.message.attachments.firstKey() === messageReaction.message.attachments.lastKey()) {
-		console.log("messageReaction has 1 attachment");
-		return messageReaction.message.attachments.first();
+	// Was the original message a reply to another message? If so, append that information to the final description
+	if (originalMessage.reference?.messageId) {
+		await originalMessage.channel.messages.fetch(originalMessage.reference.messageId)
+			.then(message => {
+				var replyContent = (!message.content && message.attachments.size) ? message.attachments.first().name : message.content.replace(/\n/g, ' ');
+				replyContent = (replyContent.length > 300) ? `${replyContent.substring(0, 300)}...` : replyContent;
+				embedContent.description = `> ${originalMessage.mentions.repliedUser}: ${replyContent}\n\n`;
+			})
+			.catch(err => {
+				console.error(`Error while fetching message reply reference: ${err}`);
+			});
 	}
-	// Message has > 1 attachment, we should ignore cuz it'll be a pain to format multiple uncountable attachments
-	return null;
-}
 
-const createEmbed = async (messageReaction, user) => {
-	const attachment = getAttachment(messageReaction);
-	const description = formatDescription(messageReaction, attachment);
-	// Somehow this works?
-	const emoji = await botConfiguration.getEmoji();
-	// TODO: Find a way to have the emoji actually show up in the footer when it's a custom emoji
-	// TODO: ensure the user is actually the user that sent the message and not merely the user making the reaction
-	var embed = new EmbedBuilder()
-		.setColor(0xFF9327)
-		.setAuthor({ name: user.displayName, iconURL: user.avatarURL(), url: messageReaction.message.url })
-		.setDescription(description)
-		.setFooter({ text: `${messageReaction.count}x ${emoji.value}` })
-		.setTimestamp();
-	if (attachment) {
-		embed.setImage(attachment.url)
+	// Append the original message content to the final description
+	embedContent.description += originalMessage.content;
+	embedContent.description += `\n\nOriginal message: ${messageLink(originalMessage.channelId, originalMessage.id)}`;
+
+	// Iterate through all of the original message embeds and collect them
+	if (originalMessage.embeds.length) {
+		// Create an array of all the image and video-thumbnail embeds in the original message
+		const images = originalMessage.embeds
+			.filter(embed => embed.thumbnail || embed.image)
+			.map(embed => (embed.thumbnail) ? embed.thumbnail.url : embed.image.url);
+		if (images.length) {
+			// regex replace certain parts of common GIF urls
+			images.forEach((url, i) => {
+				images[i] = images[i].replace(/(^https:\/\/media.tenor.com\/.*)(AAAAe\/)(.*)(\.png|\.jpg)/, "$1AAAAC/$3.gif");
+			});
+			embedContent.imageUrls = images;
+		}
+		// Check for a bot-posted embed
+		if (originalMessage.content === '') {
+			const botEmbed = originalMessage.embeds[0];
+			if (botEmbed.description) {
+				embedContent.description += botEmbed.description;
+			} else if (botEmbed.fields && botEmbed.fields[0].value) {
+				embedContent.description += botEmbed.fields[0].value;
+			}
+		}
 	}
-	return embed;
+
+	// Iterate through all of the original message attachments and collect them
+	if (originalMessage.attachments.size) {
+		originalMessage.attachments.each(attachment => {
+			embedContent.imageUrls.push(attachment.url);
+			embedContent.description += `\nFile: [${attachment.name}](${attachment.url})`;
+		});
+	}
+
+	// Stickers? Gif stickers aren't animated so it's w/e, I don't think this'll be that popular of a reaction
+	if (originalMessage.stickers.size) {
+		originalMessage.stickers.each(sticker => {
+			embedContent.imageUrls.push(sticker.url);
+		});
+	}
+
+	// TODO: I'm pretty sure video embeds are impossible for the embed builder so this is just a placeholder if it ever becomes possible
+
+
+	// We can use a common url to attach all images of any message to a single Embed
+	const firstImageUrl = (embedContent.imageUrls.length) ? embedContent.imageUrls.shift() : null;
+	// Use the previously collected information to actually build a proper embed object
+	// TODO: Find a way to have the emoji actually show up in the footer when it's a custom emoji. Current workaround is to use a setting and have it be a generic emoji for now
+	var allEmbeds = [
+		new EmbedBuilder()
+			.setURL(firstImageUrl)
+			.setColor(0xFF9327)
+			.setAuthor({ name: originalMessage.author.displayName, iconURL: originalMessage.author.avatarURL(), url: messageReaction.message.url })
+			.setDescription(embedContent.description)
+			.setImage(firstImageUrl)
+			.setFooter({ text: `${messageReaction.count}x ${messageReaction.emoji}` })
+			.setTimestamp()
+	];
+	embedContent.imageUrls.forEach(url => {
+		allEmbeds.push(new EmbedBuilder().setURL(firstImageUrl).setImage(url));
+	})
+
+	return allEmbeds;
+
 }
 
 // This feels so dumb. Please just let me grab the existing embed object and modify certain parts, then do the message.edit
 const editEmbed = async (messageReaction, user, excellencePost) => {
-	var embed = await createEmbed(messageReaction, user);
+	var embeds = await createNewEmbed(messageReaction);
 	const channelId = await botConfiguration.getChannelId();
-	const channel = user.client.channels.cache.get(channelId.value);
+	const channel = user.client.channels.cache.get(channelId);
 	const existingEmbed = await channel.messages.fetch(excellencePost.embed_id);
-	return existingEmbed.edit({ embeds: [embed] });
+	return existingEmbed.edit({ embeds: embeds });
 }
 
 const postEmbed = async (messageReaction, user) => {
-	var embed = await createEmbed(messageReaction, user);
+	var embeds = await createNewEmbed(messageReaction);
 	const channelId = await botConfiguration.getChannelId();
-	const channel = user.client.channels.cache.get(channelId.value);
-	return channel.send({ embeds: [embed] });
+	const channel = user.client.channels.cache.get(channelId);
+	return channel.send({ embeds: embeds });
 }
 
 module.exports = {
