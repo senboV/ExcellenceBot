@@ -26,6 +26,9 @@ const postExcellenceEmbed = async (messageReaction, user) => {
 module.exports = {
 	name: Events.MessageReactionAdd,
 	execute(messageReaction, user) {
+		// Do not handle message already in the channel this bot is posting in
+		if (messageReaction.message.channel.id == botConfiguration.getChannelId()) return
+		
 		// It's likely that the message that triggered this event isn't cached, so we need to fetch all the data we can
 		if (messageReaction.partial) {
 			console.log("Fetching full message reaction...");
