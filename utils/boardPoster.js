@@ -82,6 +82,7 @@ const createNewEmbed = async (messageReaction) => {
 	const firstImageUrl = (embedContent.imageUrls.length) ? embedContent.imageUrls.shift() : null;
 	// Use the previously collected information to actually build a proper embed object
 	// TODO: Find a way to have the emoji actually show up in the footer when it's a custom emoji. Current workaround is to use a setting and have it be a generic emoji for now
+	const embedEmoji = await botConfiguration.getEmbedEmoji();
 	var allEmbeds = [
 		new EmbedBuilder()
 			.setURL(firstImageUrl)
@@ -89,7 +90,7 @@ const createNewEmbed = async (messageReaction) => {
 			.setAuthor({ name: originalMessage.author.displayName, iconURL: originalMessage.author.avatarURL(), url: messageReaction.message.url })
 			.setDescription(embedContent.description)
 			.setImage(firstImageUrl)
-			.setFooter({ text: `${messageReaction.count}x ${messageReaction.emoji}` })
+			.setFooter({ text: `${messageReaction.count}x ${embedEmoji}` })
 			.setTimestamp()
 	];
 	embedContent.imageUrls.forEach(url => {
