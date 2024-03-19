@@ -8,8 +8,8 @@ const postExcellenceEmbed = async (messageReaction, user) => {
 	const threshold = await botConfiguration.getThreshold();
 
 	// Ensure that the message has the correct reaction with a count higher than the threshold
-	if (messageReaction.emoji.toString() === emojiString.value) {
-		if (messageReaction.count >= threshold.value) {
+	if (messageReaction.emoji.toString() === emojiString) {
+		if (messageReaction.count >= threshold) {
 			const embedMessageId = await databaseHelper.getPost(messageReaction.message.id, messageReaction.message.guildId);
 			//If an embed post doesn't exist for the message, create a new one, otherwise edit the existing one
 			if (embedMessageId === null) {
