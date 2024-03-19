@@ -5,7 +5,7 @@ const argumentName = 'emoji';
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('set_emoji')
+        .setName('set_reaction_emoji')
         .setDescription('Sets the emoji for the bot to watch for and count.')
         .addStringOption(option =>
             option.setName(argumentName)
@@ -15,7 +15,7 @@ module.exports = {
         .setDMPermission(false),
     async execute(interaction) {
         const emojiString = interaction.options.getString(argumentName);
-        await interaction.reply({ content: `Setting Emoji to: ${emojiString}`, ephemeral: true });
-        botConfiguration.setEmoji(emojiString);
+        await interaction.reply({ content: `Setting Reaction Emoji to: ${emojiString}`, ephemeral: true });
+        botConfiguration.setReactionEmoji(emojiString);
     }
 }
