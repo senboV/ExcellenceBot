@@ -10,7 +10,8 @@ var emoji = null;
 const getChannelId = async () => {
     if (channelId === null) {
         console.log('Retreiving Channel Id from Database');
-        channelId = await databaseHelper.getSetting(databaseHelper.channel);
+        const channelIdRow = await databaseHelper.getSetting(databaseHelper.channel);
+        channelId = channelIdRow.value;
     }
     return channelId;
 }
@@ -24,7 +25,8 @@ const setChannelId = (newChannelId) => {
 const getThreshold = async () => {
     if (threshold === null) {
         console.log('Retreiving Threshold from Database');
-        threshold = await databaseHelper.getSetting(databaseHelper.threshold);
+        const thresholdRow = await databaseHelper.getSetting(databaseHelper.threshold);
+        threshold = thresholdRow.value;
     }
     return threshold;
 }
@@ -38,7 +40,8 @@ const setThreshold = async (newThreshold) => {
 const getEmoji = async () => {
     if (emoji === null) {
         console.log('Retreiving Emoji String from Database');
-        emoji = await databaseHelper.getSetting(databaseHelper.emoji);
+        const emojiRow = await databaseHelper.getSetting(databaseHelper.emoji);
+        emoji = emojiRow.value;
     }
     return emoji;
 }
