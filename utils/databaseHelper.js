@@ -25,8 +25,9 @@ const initializeDb = (force) => {
     sequelize.sync({ force }).then(async () => {
         const settings = [
             BotSettings.upsert({ name: channel, value: '1215090521895346206' }),
-            BotSettings.upsert({ name: reactionEmoji, value: '<:ex:1215067433413382206>' }),
             BotSettings.upsert({ name: threshold, value: '1' }),
+            BotSettings.upsert({ name: reactionEmoji, value: '<:ex:1215067433413382206>' }),
+            BotSettings.upsert({ name: embedEmoji, value: '⭐' }),
         ];
 
         await Promise.all(settings);
