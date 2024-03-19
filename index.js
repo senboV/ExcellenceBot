@@ -88,7 +88,7 @@ for (const file of eventFiles){
  * TODO: Various improvements -> 
  * date range
  * max length messages
- * time buffer between first post/editing and additional reactions (grace period)
+ * time buffer between first post/editing and additional reactions (grace period?)
  * embed color as setting?
  * admin command: force an embed on a specific post
  * admin command: delete an existing embed

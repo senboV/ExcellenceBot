@@ -12,14 +12,14 @@ const botConfiguration = require('./botConfiguration.js');
  * - footer with emote count and Timestamp
  */
 
-const createNewEmbed = async (messageReaction) => {
-	const originalMessage = messageReaction.message;
+const createNewEmbed = async (originalMessage, reactionCount) => {
 	var embedContent = {
 		description: '',
 		imageUrls: [],
 	}
 
 	// Was the original message a reply to another message? If so, append that information to the final description
+	// TODO: change the 300 into a configurable setting (reply parent length) to remove it as a magic number
 	if (originalMessage.reference?.messageId) {
 		await originalMessage.channel.messages.fetch(originalMessage.reference.messageId)
 			.then(message => {
@@ -87,10 +87,10 @@ const createNewEmbed = async (messageReaction) => {
 		new EmbedBuilder()
 			.setURL(firstImageUrl)
 			.setColor(0xFF9327)
-			.setAuthor({ name: originalMessage.author.displayName, iconURL: originalMessage.author.avatarURL(), url: messageReaction.message.url })
+			.setAuthor({ name: originalMessage.author.displayName, iconURL: originalMessage.author.avatarURL(), url: originalMessage.url })
 			.setDescription(embedContent.description)
 			.setImage(firstImageUrl)
-			.setFooter({ text: `${messageReaction.count}x ${embedEmoji}` })
+			.setFooter({ text: `${reactionCount}x ${embedEmoji}` })
 			.setTimestamp()
 	];
 	embedContent.imageUrls.forEach(url => {
@@ -103,7 +103,9 @@ const createNewEmbed = async (messageReaction) => {
 
 // This feels so dumb. Please just let me grab the existing embed object and modify certain parts, then do the message.edit
 const editEmbed = async (messageReaction, user, excellencePost) => {
-	var embeds = await createNewEmbed(messageReaction);
+	const originalmessage = messageReaction.message;
+	const reactionCount = messageReaction.count;
+	var embeds = await createNewEmbed(originalmessage, reactionCount);
 	const channelId = await botConfiguration.getChannelId();
 	const channel = user.client.channels.cache.get(channelId);
 	const existingEmbed = await channel.messages.fetch(excellencePost.embed_id);
@@ -111,7 +113,17 @@ const editEmbed = async (messageReaction, user, excellencePost) => {
 }
 
 const postEmbed = async (messageReaction, user) => {
-	var embeds = await createNewEmbed(messageReaction);
+	const originalmessage = messageReaction.message;
+	const reactionCount = messageReaction.count;
+	var embeds = await createNewEmbed(originalmessage, reactionCount);
+	const channelId = await botConfiguration.getChannelId();
+	const channel = user.client.channels.cache.get(channelId);
+	return channel.send({ embeds: embeds });
+}
+
+const forcePostEmbed = async (message) => {
+
+	var embeds = await createNewEmbed(message, 0)
 	const channelId = await botConfiguration.getChannelId();
 	const channel = user.client.channels.cache.get(channelId);
 	return channel.send({ embeds: embeds });
@@ -120,4 +132,5 @@ const postEmbed = async (messageReaction, user) => {
 module.exports = {
 	editEmbed,
 	postEmbed,
+	forcePostEmbed,
 }
