@@ -4,7 +4,7 @@ const botConfiguration = require('../utils/botConfiguration.js');
 const databaseHelper = require('../utils/databaseHelper.js');
 
 const postExcellenceEmbed = async (messageReaction, user) => {
-	const emojiString = await botConfiguration.getEmoji();
+	const emojiString = await botConfiguration.getReactionEmoji();
 	const threshold = await botConfiguration.getThreshold();
 
 	// Ensure that the message has the correct reaction with a count higher than the threshold

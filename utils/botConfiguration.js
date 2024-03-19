@@ -4,7 +4,8 @@ const databaseHelper = require('./databaseHelper.js');
 
 var channelId = null;
 var threshold = null;
-var emoji = null;
+var reactionEmoji = null;
+var embedEmoji = null;
 
 // If there is no value, go to the DB and find it, otherwise return what is known
 const getChannelId = async () => {
@@ -37,18 +38,32 @@ const setThreshold = async (newThreshold) => {
     return databaseHelper.updateSetting(databaseHelper.threshold, newThreshold);
 }
 
-const getEmoji = async () => {
-    if (emoji === null) {
-        console.log('Retreiving Emoji String from Database');
-        const emojiRow = await databaseHelper.getSetting(databaseHelper.emoji);
-        emoji = emojiRow.value;
+const getReactionEmoji = async () => {
+    if (reactionEmoji === null) {
+        console.log('Retreiving Reaction Emoji String from Database');
+        const emojiRow = await databaseHelper.getSetting(databaseHelper.reactionEmoji);
+        reactionEmoji = emojiRow.value;
     }
-    return emoji;
+    return reactionEmoji;
 }
 
-const setEmoji = async (newEmoji) => {
-    emoji = newEmoji;
-    return databaseHelper.updateSetting(databaseHelper.emoji, newEmoji);
+const setReactionEmoji = async (newEmoji) => {
+    reactionEmoji = newEmoji;
+    return databaseHelper.updateSetting(databaseHelper.reactionEmoji, newEmoji);
+}
+
+const getEmbedEmoji = async () => {
+    if (embedEmoji === null) {
+        console.log('Retreiving Embed Emoji String from Database');
+        const emojiRow = await databaseHelper.getSetting(databaseHelper.embedEmoji);
+        embedEmoji = emojiRow.value;
+    }
+    return embedEmoji;
+}
+
+const setEmbedEmoji = async (newEmoji) => {
+    embedEmoji = newEmoji;
+    return databaseHelper.updateSetting(databaseHelper.embedEmoji, newEmoji);
 }
 
 module.exports = {
@@ -56,6 +71,8 @@ module.exports = {
     setChannelId,
     getThreshold,
     setThreshold,
-    getEmoji,
-    setEmoji,
+    getReactionEmoji,
+    setReactionEmoji,
+    getEmbedEmoji,
+    setEmbedEmoji,
 }

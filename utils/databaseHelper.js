@@ -17,14 +17,15 @@ const ExcelPosts = require('../models/excellencePost.js')(sequelize, Sequelize.D
 // Database table name constants
 const channel = "channel";
 const threshold = "threshold";
-const emoji = "emoji";
+const reactionEmoji = "reactionEmoji";
+const embedEmoji = "embedEmoji";
 
 // Create a default database
 const initializeDb = (force) => {
     sequelize.sync({ force }).then(async () => {
         const settings = [
-            BotSettings.upsert({ name: channel, value: null }),
-            BotSettings.upsert({ name: emoji, value: '123456789' }),
+            BotSettings.upsert({ name: channel, value: '1215090521895346206' }),
+            BotSettings.upsert({ name: reactionEmoji, value: '<:ex:1215067433413382206>' }),
             BotSettings.upsert({ name: threshold, value: '1' }),
         ];
 
@@ -98,7 +99,8 @@ const removePost = async (messageId, guildId) => {
 module.exports = {
     channel,
     threshold,
-    emoji,
+    reactionEmoji,
+    embedEmoji,
     initializeDb,
     addSetting,
     getSetting,

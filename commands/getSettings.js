@@ -10,7 +10,8 @@ module.exports = {
     async execute(interaction) {
         const channel = await botConfiguration.getChannelId();
         const threshold = await botConfiguration.getThreshold();
-        const emoji = await botConfiguration.getEmoji();
-        await interaction.reply({ content: `All Bot Settings:\nThreshold: ${threshold}\nEmoji: ${emoji}\nChannel: ${channel}`, ephemeral: true });
+        const reactionEmoji = await botConfiguration.getReactionEmoji();
+        const embedEmoji = await botConfiguration.getReactionEmoji();
+        await interaction.reply({ content: `All Bot Settings:\nChannel: ${channel}\nThreshold: ${threshold}\nReaction Emoji: ${reactionEmoji}\Embed Emoji: ${embedEmoji}`, ephemeral: true });
     }
 } 
