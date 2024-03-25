@@ -10,11 +10,11 @@ const postExcellenceEmbed = async (messageReaction, user) => {
 	// Ensure that the message has the correct reaction with a count higher than the threshold
 	if (messageReaction.emoji.toString() === emojiString) {
 		if (messageReaction.count >= threshold) {
-			const embedMessageId = await databaseHelper.getPost(messageReaction.message.id, messageReaction.message.guildId);
+			const embedMessageId = await databaseHelper.getPost(messageReaction.message.guildId, messageReaction.message.channelId, messageReaction.message.id);
 			//If an embed post doesn't exist for the message, create a new one, otherwise edit the existing one
 			if (embedMessageId === null) {
 				const newEmbedMessage = await boardPoster.postEmbed(messageReaction, user);
-				return databaseHelper.addPost(messageReaction.message.id, messageReaction.message.guildId, newEmbedMessage.id);
+				return databaseHelper.addPost(messageReaction.message.guildId, messageReaction.message.channelId, messageReaction.message.id, newEmbedMessage.id);
 			} else {
 				// edit an existing embed
 				return boardPoster.editEmbed(messageReaction, user, embedMessageId);

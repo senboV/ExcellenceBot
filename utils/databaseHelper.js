@@ -1,12 +1,17 @@
 const Sequelize = require('sequelize');
+const dotenv = require('dotenv');
+
+// Configure dotenv to load the environment variables from the .env file
+dotenv.config();
 
 // Default Database connection object
-const sequelize = new Sequelize('database', 'user', 'password', {
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
     host: 'localhost',
-    dialect: 'sqlite',
-    logging: false,
+    dialect: 'postgres',
+    
+    /*logging: false,
     // SQLite only
-    storage: 'database.sqlite',
+    storage: 'database.sqlite',*/
 });
 
 // imported Database Models, using the existing database connection
@@ -67,31 +72,33 @@ const removeSetting = async (name) => {
 }
 
 // add new post
-const addPost = async (messageId, guildId, embedId) => {
-    return ExcelPosts.create({ guild_id: guildId, message_id: messageId, embed_id: embedId });
+const addPost = async (guildId, channelId, messageId, embedId) => {
+    return ExcelPosts.create({ guild_id: guildId, channel_id: channelId, message_id: messageId, embed_id: embedId });
 }
 
 // get specific Embeded Excellence Post
-const getPost = async (messageId, guildId) => {
-    // For composite PKs, which is how Excel Posts are stored (GuildId+MessageId)
+const getPost = async (guildId, channelId, messageId) => {
+    // For composite PKs, which is how Excel Posts are stored (GuildId+ChannelId+MessageId)
     return ExcelPosts.findOne({
         where: {
             guild_id: guildId,
+            channel_id: channelId,
             message_id: messageId,
         }
     });
 }
 
 // update existing post
-const updatePost = async (messageId, guildId, embedId) => {
-    return ExcelPosts.upsert({ guild_id: guildId, message_id: messageId, embed_id: embedId });
+const updatePost = async (guildId, channelId, messageId, embedId) => {
+    return ExcelPosts.upsert({ guild_id: guildId, channel_id: channelId, message_id: messageId, embed_id: embedId });
 }
 
 // remove post
-const removePost = async (messageId, guildId) => {
+const removePost = async (guildId, channelId, messageId) => {
     return ExcelPosts.destroy({
         where: {
             guild_id: guildId,
+            channel_id: channelId,
             message_id: messageId,
         }
     });
