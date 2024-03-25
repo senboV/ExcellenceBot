@@ -18,7 +18,7 @@ module.exports = {
     async execute(interaction) {
         const messageUrl = interaction.options.getString(argumentName);
         await interaction.reply({ content: `Forcing Embed Post from message: ${messageUrl}`, ephemeral: true });
-        // regex to extra guild, channel, and message ID from the url?
+        // regex to extract guild, channel, and message ID from the url?
         // interaction -> message object from IDs -> force post
 
     }
