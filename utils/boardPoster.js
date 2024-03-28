@@ -1,6 +1,11 @@
 const { EmbedBuilder, messageLink } = require('discord.js');
 const botConfiguration = require('./botConfiguration.js');
 
+// Used to ensure that edits or double posts are not performed until the FIRST request to post an embed has completed.
+// Items in the array are strings: 'combination string for the new PK for the embed'.
+
+var newPostProcessing = [];
+
 /** 
  * Embed Format should follow:
  * - Original Message Reply-Parent + a new line
@@ -103,22 +108,28 @@ const createNewEmbed = async (originalMessage, reactionCount) => {
 
 // This feels so dumb. Please just let me grab the existing embed object and modify certain parts, then do the message.edit
 const editEmbed = async (messageReaction, user, excellencePost) => {
-	const originalmessage = messageReaction.message;
+	const originalMessage = messageReaction.message;
 	const reactionCount = messageReaction.count;
-	var embeds = await createNewEmbed(originalmessage, reactionCount);
+	const embedPrimaryKeyString = `${originalMessage.guildId}${originalMessage.channelId}${originalMessage.id}`;
+	if (newPostProcessing.includes(embedPrimaryKeyString)) return;
+	var embeds = await createNewEmbed(originalMessage, reactionCount);
 	const channelId = await botConfiguration.getChannelId();
 	const channel = user.client.channels.cache.get(channelId);
 	const existingEmbed = await channel.messages.fetch(excellencePost.embed_id);
-	return existingEmbed.edit({ embeds: embeds });
+	await existingEmbed.edit({ embeds: embeds });
 }
 
 const postEmbed = async (messageReaction, user) => {
-	const originalmessage = messageReaction.message;
+	const originalMessage = messageReaction.message;
 	const reactionCount = messageReaction.count;
-	var embeds = await createNewEmbed(originalmessage, reactionCount);
+	const embedPrimaryKeyString = `${originalMessage.guildId}${originalMessage.channelId}${originalMessage.id}`;
+	if (newPostProcessing.includes(embedPrimaryKeyString)) return;
+	newPostProcessing.push(embedPrimaryKeyString);
+	var embeds = await createNewEmbed(originalMessage, reactionCount);
 	const channelId = await botConfiguration.getChannelId();
 	const channel = user.client.channels.cache.get(channelId);
-	return channel.send({ embeds: embeds });
+	await channel.send({ embeds: embeds });
+	newPostProcessing = newPostProcessing.filter(newPostId => newPostId !== embedPrimaryKeyString);
 }
 
 const forcePostEmbed = async (message) => {
