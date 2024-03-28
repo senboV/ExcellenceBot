@@ -33,14 +33,14 @@ module.exports = {
 		if (messageReaction.partial) {
 			console.log("Fetching full message reaction...");
 			messageReaction.fetch()
-				.then(fullMessageReaction => {
-					postExcellenceEmbed(fullMessageReaction, user);
+				.then(async fullMessageReaction => {
+					await postExcellenceEmbed(fullMessageReaction, user);
 				})
 				.catch(error => {
 					console.log('Something went wrong when fetching the message: ', error);
 				});
 		} else {
-			postExcellenceEmbed(messageReaction, user);
+			await postExcellenceEmbed(messageReaction, user);
 		}
 	},
 };
