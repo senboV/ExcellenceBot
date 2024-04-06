@@ -116,7 +116,7 @@ const editEmbed = async (messageReaction, user, excellencePost) => {
 	const channelId = await botConfiguration.getChannelId();
 	const channel = user.client.channels.cache.get(channelId);
 	const existingEmbed = await channel.messages.fetch(excellencePost.embed_id);
-	await existingEmbed.edit({ embeds: embeds });
+	return existingEmbed.edit({ embeds: embeds });
 }
 
 const postEmbed = async (messageReaction, user) => {
@@ -128,8 +128,9 @@ const postEmbed = async (messageReaction, user) => {
 	var embeds = await createNewEmbed(originalMessage, reactionCount);
 	const channelId = await botConfiguration.getChannelId();
 	const channel = user.client.channels.cache.get(channelId);
-	await channel.send({ embeds: embeds });
+	const newEmbedMessage = await channel.send({ embeds: embeds });
 	newPostProcessing = newPostProcessing.filter(newPostId => newPostId !== embedPrimaryKeyString);
+	return newEmbedMessage;
 }
 
 const forcePostEmbed = async (message) => {
