@@ -1,0 +1,6 @@
+.eslint*
+*.code-workspace
+*.vscode
+*.sqlite
+*.db
+sqlite*/
