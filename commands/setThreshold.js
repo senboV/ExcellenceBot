@@ -15,7 +15,7 @@ module.exports = {
         .setDMPermission(false),
     async execute(interaction) {
         const newThreshold = interaction.options.getInteger(argumentName);
-        await interaction.reply({ content: `Setting Threshold to: ${newThreshold}`, ephemeral: true });
+        await interaction.reply({ content: `Setting Threshold to: ${newThreshold}`, flags: MessageFlags.Ephemeral });
         botConfiguration.setThreshold(newThreshold);
     }
 }

@@ -7,6 +7,6 @@ module.exports = {
         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .setDMPermission(false),
     async execute(interaction) {
-        await interaction.reply('Pong!');
+        await interaction.reply({ content: 'Pong!', flags: MessageFlags.Ephemeral});
     }
 }

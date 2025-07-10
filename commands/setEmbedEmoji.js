@@ -15,7 +15,7 @@ module.exports = {
         .setDMPermission(false),
     async execute(interaction) {
         const emojiString = interaction.options.getString(argumentName);
-        await interaction.reply({ content: `Setting Embed Emoji to: ${emojiString}`, ephemeral: true });
+        await interaction.reply({ content: `Setting Embed Emoji to: ${emojiString}`, flags: MessageFlags.Ephemeral });
         botConfiguration.setEmbedEmoji(emojiString);
     }
 }

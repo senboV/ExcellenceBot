@@ -16,7 +16,7 @@ module.exports = {
         .setDMPermission(false),
     async execute(interaction) {
         const newChannel = interaction.options.getChannel(argumentName);
-        await interaction.reply({ content: `Setting Embed Post Channel to: ${newChannel.name}`, ephemeral: true });
+        await interaction.reply({ content: `Setting Embed Post Channel to: ${newChannel.name}`, flags: MessageFlags.Ephemeral });
         botConfiguration.setChannelId(newChannel.id);
     }
 }

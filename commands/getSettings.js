@@ -12,6 +12,6 @@ module.exports = {
         const threshold = await botConfiguration.getThreshold();
         const reactionEmoji = await botConfiguration.getReactionEmoji();
         const embedEmoji = await botConfiguration.getEmbedEmoji();
-        await interaction.reply({ content: `All Bot Settings:\nChannel: ${channel}\nThreshold: ${threshold}\nReaction Emoji: ${reactionEmoji}\nEmbed Emoji: ${embedEmoji}`, ephemeral: true });
+        await interaction.reply({ content: `All Bot Settings:\nChannel: ${channel}\nThreshold: ${threshold}\nReaction Emoji: ${reactionEmoji}\nEmbed Emoji: ${embedEmoji}`, flags: MessageFlags.Ephemeral });
     }
 } 
