@@ -8,22 +8,20 @@ dotenv.config();
 const postgresConnection = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
     host: process.env.DB_ENDPOINT,
     dialect: 'postgres',
-    dialectOptions: {
+    /*dialectOptions: {
         ssl: {
             require: true
         }
-    },
+    },*/
 });
 
 // Default SQLite connection object
-const sqliteConnection = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
-    host: process.env.DB_ENDPOINT,
+const sqliteConnection = new Sequelize({
     dialect: 'sqlite',
-    logging: false,
     storage: 'sqlitedbs/postgres_azure_exbot_backup.db',
 });
 
-const sequelizeConnection = sqliteConnection;
+const sequelizeConnection = postgresConnection;
 
 // imported Database Models, using the existing database connection
 // TODO: Move path strings to config file or env so that they all get edited in one place
