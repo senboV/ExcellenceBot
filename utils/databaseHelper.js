@@ -20,7 +20,7 @@ const sqliteConnection = new Sequelize(process.env.DB_NAME, process.env.DB_USER,
     host: process.env.DB_ENDPOINT,
     dialect: 'sqlite',
     logging: false,
-    storage: 'postgres_azure_exbot_backup.db',
+    storage: 'sqlitedbs/postgres_azure_exbot_backup.db',
 });
 
 const sequelizeConnection = sqliteConnection;
