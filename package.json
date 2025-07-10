@@ -1,7 +1,7 @@
 {
   "name": "excellencebot",
   "version": "1.0.0",
-  "description": "Excellence Bot for PEBE",
+  "description": "Excellence Bot for FOE",
   "main": "index.js",
   "scripts": {
     "main": "node index.js",

@@ -4,11 +4,10 @@ const dotenv = require('dotenv');
 // Configure dotenv to load the environment variables from the .env file
 dotenv.config();
 
-// Default Database connection object
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
+// Default Postgres connection object
+const postgresConnection = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
     host: process.env.DB_ENDPOINT,
     dialect: 'postgres',
-    //logging: false,
     dialectOptions: {
         ssl: {
             require: true
@@ -16,10 +15,20 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     },
 });
 
+// Default SQLite connection object
+const sqliteConnection = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASS, {
+    host: process.env.DB_ENDPOINT,
+    dialect: 'sqlite',
+    logging: false,
+    storage: 'postgres_azure_exbot_backup.db',
+});
+
+const sequelizeConnection = sqliteConnection;
+
 // imported Database Models, using the existing database connection
 // TODO: Move path strings to config file or env so that they all get edited in one place
-const BotSettings = require('../models/setting.js')(sequelize, Sequelize.DataTypes);
-const ExcelPosts = require('../models/excellencePost.js')(sequelize, Sequelize.DataTypes);
+const BotSettings = require('../models/setting.js')(sequelizeConnection, Sequelize.DataTypes);
+const ExcelPosts = require('../models/excellencePost.js')(sequelizeConnection, Sequelize.DataTypes);
 
 // Database table name constants
 const channel = "channel";
@@ -28,8 +37,8 @@ const reactionEmoji = "reactionEmoji";
 const embedEmoji = "embedEmoji";
 
 // Create a default database
-const initializeDb = (force) => {
-    sequelize.sync({ force }).then(async () => {
+const createDefaultInitialDb = (force) => {
+    sequelizeConnection.sync({ force }).then(async () => {
         const settings = [
             BotSettings.upsert({ name: channel, value: '1215090521895346206' }),
             BotSettings.upsert({ name: threshold, value: '1' }),
@@ -40,7 +49,7 @@ const initializeDb = (force) => {
         await Promise.all(settings);
         console.log('Database Synced');
 
-        sequelize.close();
+        sequelizeConnection.close();
     }).catch(console.error);
 }
 
@@ -111,7 +120,7 @@ module.exports = {
     threshold,
     reactionEmoji,
     embedEmoji,
-    initializeDb,
+    createDefaultInitialDb,
     addSetting,
     getSetting,
     getAllSettings,
