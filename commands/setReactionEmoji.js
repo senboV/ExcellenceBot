@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, PermissionFlagsBits, parseResponse, parseEmoji } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, parseResponse, parseEmoji, MessageFlags } = require('discord.js');
 const botConfiguration = require('../utils/botConfiguration.js');
 
 const argumentName = 'emoji';

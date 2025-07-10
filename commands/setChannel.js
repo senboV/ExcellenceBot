@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, ChannelType, PermissionFlagsBits } = require('discord.js');
+const { SlashCommandBuilder, ChannelType, PermissionFlagsBits, MessageFlags } = require('discord.js');
 const botConfiguration = require('../utils/botConfiguration.js');
 
 const argumentName = 'channel';
